@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<!--
+  ESTILO: IFAL · SISTEMAS BIOMÉDICOS
+  Baseado na apresentação institucional do IFAL (Campus Arapiraca).
+
+  IDENTIDADE
+  - Palco fixo 16:9 (1920x1080) escalado para a janela; fundo branco.
+  - Títulos: Montserrat 900, CAIXA ALTA, verde #299626, no topo à esquerda, ao lado do logo IF.
+  - Subtítulo do título: Montserrat 400, sem caixa alta, ex.: "(Conceituais)".
+  - Corpo: DM Sans; listas com marcador circular verde; texto em verde ou grafite.
+  - Destaques: vermelho #c8102e (caixa de destaque .hl-box, setas desenhadas, alertas).
+  - Rodapé: faixa verde de 104px com o número do slide à esquerda e "SISTEMAS BIOMÉDICOS" à direita.
+  - Capa: fundo escuro azul-petróleo, logo branco, título verde em caixa alta, disciplina e professor em verde.
+  - Fotografias são substituídas por painéis .visual (gradiente petróleo + ícone luminoso).
+
+  ROTEIRO TÍPICO (padrão de aula)
+  Capa → Onde estamos? → Objetivos da aula → Situação-problema → Conteúdo
+  → Tomada de decisão (retoma a situação-problema) → Bibliografia → Obrigado! / Dúvidas???
+
+  COMPONENTES: .bullets, .objectives, .hl-box, .visual, .card (.red/.soft), table.tb,
+  .flow (bolhas com ícones), .note, .big-quote, .bib, .end-wrap. Etapas animadas: .step
+-->
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFAL Sistemas Biomédicos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   ESTILO IFAL · SISTEMAS BIOMÉDICOS
+   Palco fixo 16:9 (1920×1080) escalado para a janela.
+   ========================================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --green: #299626;
+    --green-dark: #2f6b2c;
+    --green-soft: #eaf5e9;
+    --red: #c8102e;
+    --red-soft: #fdecee;
+    --ink: #1c2a1b;
+    --gray: #5b6660;
+    --line: #d9e3d8;
+    --night: #06161d;
+    --teal: #0e3a46;
+    --cyan: #5fd3e6;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html, body { width: 100%; height: 100%; background: #0b0f0e; overflow: hidden; }
+body { font-family: 'DM Sans', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+#viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+#stage {
+    width: 1920px; height: 1080px;
+    position: relative;
+    background: #fff;
+    transform-origin: center center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.slide {
+    position: absolute; inset: 0;
+    background: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity .6s var(--ease), visibility .6s;
+}
+.slide.active { opacity: 1; visibility: visible; }
+
+/* ---------- Cabeçalho ---------- */
+.logo { position: absolute; left: 82px; top: 54px; width: 128px; }
+.logo svg { width: 100%; height: auto; display: block; }
+
+.title {
+    position: absolute; left: 240px; top: 46px; right: 90px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 84px;
+    line-height: 1.02;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    color: var(--green);
+}
+.title.sm { font-size: 70px; }
+.title .sub {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 54px;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 6px;
+}
+
+/* ---------- Rodapé ---------- */
+.footer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 104px;
+    background: var(--green);
+    color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 72px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 5;
+}
+
+/* ---------- Área de conteúdo ---------- */
+.body {
+    position: absolute;
+    left: 90px; right: 90px;
+    top: 250px; bottom: 150px;
+    display: flex; align-items: center;
+}
+.body.top { align-items: flex-start; }
+.row { display: flex; gap: 60px; width: 100%; align-items: center; }
+.col { flex: 1; min-width: 0; }
+
+/* Listas no padrão do modelo */
+.bullets { list-style: none; }
+.bullets li {
+    position: relative;
+    padding-left: 42px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1.2;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 52px;
+}
+.bullets li:last-child { margin-bottom: 0; }
+.bullets li::before {
+    content: '';
+    position: absolute; left: 4px; top: 0.48em;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--green);
+}
+.bullets.normal li { text-transform: none; font-size: 40px; font-weight: 500; margin-bottom: 34px; color: var(--ink); }
+.bullets.normal li::before { background: var(--green); }
+.bullets.normal li b { color: var(--green); font-weight: 700; }
+.bullets.sm li { font-size: 34px; margin-bottom: 24px; }
+
+/* Objetivos (texto justificado, Montserrat) */
+.objectives { list-style: none; padding-left: 50px; }
+.objectives li {
+    position: relative;
+    padding-left: 46px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1.12;
+    color: var(--green);
+    text-align: justify;
+    margin-bottom: 64px;
+}
+.objectives li:last-child { margin-bottom: 0; }
+.objectives li::before {
+    content: ''; position: absolute; left: 0; top: 0.5em;
+    width: 14px; height: 14px; border-radius: 50%; background: var(--ink);
+}
+.objectives li .k { color: var(--green-dark); font-weight: 800; }
+
+/* Caixa vermelha de destaque */
+.hl-box { outline: 7px solid var(--red); outline-offset: 22px; }
+
+/* Painel visual (substitui fotografias) */
+.visual {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(95,211,230,.28), transparent 55%),
+        radial-gradient(ellipse at 80% 90%, rgba(41,150,38,.25), transparent 55%),
+        linear-gradient(160deg, #0f4655 0%, #082731 55%, #04121a 100%);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    color: #cdf6ff;
+}
+.visual::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+.visual svg.ic { position: relative; filter: drop-shadow(0 0 18px rgba(95,211,230,.55)); }
+.visual .cap {
+    position: absolute; left: 0; right: 0; bottom: 22px;
+    text-align: center;
+    font-size: 24px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(205,246,255,.75);
+}
+
+/* Cards */
+.card {
+    background: #fff;
+    border: 2px solid var(--line);
+    border-top: 8px solid var(--green);
+    padding: 30px 30px 32px;
+}
+.card h4 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 34px; color: var(--green); text-transform: uppercase; margin-bottom: 10px; line-height: 1.1; }
+.card p { font-size: 28px; line-height: 1.35; color: var(--gray); }
+.card.red { border-top-color: var(--red); background: var(--red-soft); border-color: #f3c9cf; }
+.card.red h4 { color: var(--red); }
+.card.soft { background: var(--green-soft); border-color: #cfe6cd; }
+.grid { display: grid; gap: 30px; width: 100%; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Tabela no padrão do modelo */
+table.tb { width: 100%; border-collapse: collapse; font-size: 32px; }
+table.tb th {
+    background: var(--green); color: #fff;
+    font-family: 'Montserrat', sans-serif; font-weight: 800;
+    text-transform: uppercase; font-size: 28px; letter-spacing: .5px;
+    padding: 20px 28px; text-align: left;
+    border: 3px solid var(--ink);
+}
+table.tb td { padding: 20px 28px; border: 3px solid var(--ink); line-height: 1.3; }
+table.tb td:first-child { font-weight: 700; color: var(--green-dark); white-space: nowrap; }
+
+/* Fluxo com ícones (padrão "Fluxo resumido") */
+.flow { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; position: relative; }
+.flow::before {
+    content: ''; position: absolute; left: 6%; right: 6%; top: 66px;
+    border-top: 4px dashed #b9cbb7; z-index: 0;
+}
+.flow .st { flex: 1; text-align: center; position: relative; z-index: 1; padding: 0 8px; }
+.flow .bub {
+    width: 132px; height: 132px; border-radius: 50%;
+    margin: 0 auto 22px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--green); color: #fff;
+    box-shadow: 0 0 0 10px #fff;
+}
+.flow .bub.red { background: var(--red); }
+.flow .bub.amber { background: #e3a008; }
+.flow .bub.blue { background: #1f6fb2; }
+.flow .n { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 38px; color: var(--ink); }
+.flow .t { font-weight: 700; font-size: 28px; color: var(--ink); line-height: 1.2; margin-top: 4px; }
+.flow .d { font-size: 23px; color: var(--gray); line-height: 1.3; margin-top: 6px; }
+
+.note {
+    display: inline-flex; align-items: center; gap: 18px;
+    border: 3px solid var(--line); padding: 18px 30px;
+    font-size: 30px; color: var(--ink); background: #fff;
+}
+.note .dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
+
+.big-quote {
+    font-family: 'Montserrat', sans-serif; font-weight: 800;
+    font-size: 54px; line-height: 1.2; color: var(--green);
+    text-transform: uppercase; text-align: center;
+}
+
+/* Animações em etapas (espaço / →) */
+.step { opacity: 0; transform: translateY(26px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.step.in { opacity: 1; transform: none; }
+
+/* ---------- Capa ---------- */
+.cover {
+    background:
+        radial-gradient(ellipse at 78% 60%, rgba(95,211,230,.22), transparent 45%),
+        radial-gradient(ellipse at 20% 85%, rgba(14,58,70,.9), transparent 60%),
+        linear-gradient(180deg, #05141a 0%, #0a2630 50%, #041016 100%);
+}
+.cover .scene { position: absolute; inset: 0; opacity: .55; }
+.cover .logo-cover { position: absolute; left: 172px; top: 86px; display: flex; gap: 26px; align-items: center; color: #fff; }
+.cover .logo-cover svg { width: 128px; }
+.cover .logo-cover .txt { font-family: 'Open Sans', 'DM Sans', sans-serif; line-height: 1.12; }
+.cover .logo-cover .txt b { font-weight: 700; font-size: 50px; letter-spacing: .5px; display: block; }
+.cover .logo-cover .txt span { font-size: 40px; display: block; }
+.cover h1 {
+    position: absolute; left: 160px; top: 400px; width: 1250px;
+    font-family: 'Montserrat', sans-serif; font-weight: 900;
+    font-size: 64px; line-height: 1.05; text-transform: uppercase;
+    color: var(--green);
+}
+.cover .disc { position: absolute; left: 162px; top: 640px; font-size: 36px; color: var(--green); }
+.cover .prof { position: absolute; left: 162px; top: 820px; font-size: 42px; font-weight: 600; letter-spacing: 1px; color: var(--green); }
+.cover .footer { padding-left: 170px; padding-right: 120px; }
+
+/* ---------- Encerramento ---------- */
+.end-wrap { position: absolute; left: 0; right: 0; top: 200px; bottom: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.end-wrap .thanks { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--green); line-height: 1; }
+.end-wrap .q { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 64px; color: var(--green-dark); margin-top: 26px; }
+.end-wrap .epi { margin-top: 60px; max-width: 1200px; font-size: 32px; color: var(--green); font-weight: 600; text-transform: uppercase; line-height: 1.4; }
+
+/* Bibliografia */
+.bib h5 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 32px; color: var(--green); margin-bottom: 20px; }
+.bib p { font-size: 27px; line-height: 1.35; color: var(--green); margin-bottom: 20px; padding-left: 40px; text-indent: -40px; }
+.bib p b { font-weight: 700; }
+
+/* Dicas de navegação */
+#hint {
+    position: fixed; right: 16px; bottom: 12px; z-index: 50;
+    font: 500 12px 'DM Sans', sans-serif; color: rgba(255,255,255,.55);
+    pointer-events: none; transition: opacity 1s;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Sprite de ícones (traço = currentColor) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo-if" viewBox="0 0 102 138">
+      <circle cx="15" cy="15" r="15" class="lg-dot"/>
+      <rect x="36" y="0" width="30" height="30" rx="4"/><rect x="72" y="0" width="30" height="30" rx="4"/>
+      <rect x="0" y="36" width="30" height="30" rx="4"/><rect x="36" y="36" width="30" height="30" rx="4"/>
+      <rect x="0" y="72" width="30" height="30" rx="4"/><rect x="36" y="72" width="30" height="30" rx="4"/><rect x="72" y="72" width="30" height="30" rx="4"/>
+      <rect x="0" y="108" width="30" height="30" rx="4"/><rect x="36" y="108" width="30" height="30" rx="4"/>
+    </symbol>
+    <g id="ic-style" />
+    <symbol id="i-lungs" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6v22M32 28c-3 3-8 4-8 4M32 28c3 3 8 4 8 4"/><path d="M24 18c-8 0-16 14-16 30 0 6 4 9 9 8l7-2c3-1 4-3 4-6V22c0-2-2-4-4-4z"/><path d="M40 18c8 0 16 14 16 30 0 6-4 9-9 8l-7-2c-3-1-4-3-4-6V22c0-2 2-4 4-4z"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="52" height="36" rx="3"/><path d="M12 30h9l4-10 6 18 5-12 3 4h13"/><path d="M24 54h16M32 46v8"/></symbol>
+    <symbol id="i-pump" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="20" width="44" height="30" rx="3"/><rect x="16" y="26" width="20" height="10" rx="1"/><circle cx="46" cy="31" r="4"/><path d="M16 43h32"/><path d="M32 4c0 0-6 7-6 10a6 6 0 0012 0c0-3-6-10-6-10z"/><path d="M32 50v8"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 56S6 40 6 22a13 13 0 0126-6 13 13 0 0126 6c0 18-26 34-26 34z"/><path d="M34 18l-8 16h10l-6 14"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18v32M6 40h52v10M58 40v-8a6 6 0 00-6-6H28v14"/><circle cx="17" cy="31" r="5"/><path d="M40 8h12v10H40z"/><path d="M46 18v8"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M36 4L12 36h18l-4 24 24-32H32z"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6v12M42 6v12M14 18h36v10a18 18 0 01-36 0z"/><path d="M32 46v14"/></symbol>
+    <symbol id="i-battery" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="18" width="46" height="28" rx="4"/><path d="M52 27h6v10h-6"/><path d="M14 26v12M22 26v12M30 26v12"/></symbol>
+    <symbol id="i-gen" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="16" width="52" height="34" rx="3"/><circle cx="24" cy="33" r="9"/><path d="M24 26v7l5 3"/><path d="M40 26h10M40 33h10M40 40h10M12 50v6M52 50v6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6L4 56h56z"/><path d="M32 24v14M32 46v1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="26"/><path d="M20 33l8 8 16-17"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 32c5 0 5-16 10-16s5 32 10 32 5-32 10-32 5 32 10 32 5-16 10-16"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M40 6a14 14 0 00-12 20L8 46a6 6 0 008 8l20-20a14 14 0 0020-12l-8 8-8-2-2-8z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="27" cy="27" r="18"/><path d="M40 40l18 18"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h26l12 12v44H14z"/><path d="M40 4v12h12M22 30h20M22 40h20M22 50h12"/></symbol>
+    <symbol id="i-block" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="26"/><path d="M14 14l36 36"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4l24 10v16c0 16-11 26-24 30C19 56 8 46 8 30V14z"/><path d="M22 32l7 7 13-14"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="10" width="44" height="40" rx="3"/><path d="M10 24h44M10 37h44"/><circle cx="18" cy="56" r="4"/><circle cx="46" cy="56" r="4"/><path d="M28 17h8"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M52 24A22 22 0 0012 20M12 40a22 22 0 0040 4"/><path d="M12 8v12h12M52 56V44H40"/></symbol>
+    <symbol id="i-recycle" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18h36l-4 40H18z"/><path d="M8 18h48M26 18V8h12v10M26 28v20M38 28v20"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 24L32 12l28 12-28 12z"/><path d="M16 30v14c8 6 24 6 32 0V30M60 24v14"/></symbol>
+    <symbol id="i-cart2" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h8l8 34h32l6-24H16"/><circle cx="24" cy="52" r="4"/><circle cx="48" cy="52" r="4"/></symbol>
+    <symbol id="i-box" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4l26 12v32L32 60 6 48V16z"/><path d="M6 16l26 12 26-12M32 28v32"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M44 6l14 14L22 56H8V42z"/><path d="M36 14l14 14"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 44c0-6-10-10-10-22a20 20 0 0140 0c0 12-10 16-10 22z"/><path d="M24 52h16M27 60h10"/></symbol>
+  </defs>
+</svg>
+
+<div id="viewport"><div id="stage">
+<!-- ==================== 1. CAPA ==================== -->
+<section class="slide cover active" data-n="1">
+    <svg class="scene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+            <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b7f93"/><stop offset="1" stop-color="#0b3440"/></linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="6"/></filter>
+        </defs>
+        <g stroke="#1d4f5c" stroke-width="10" fill="none" opacity=".7">
+            <path d="M0 150H1920M300 150V900M1600 150V1000M760 150V600"/>
+            <path d="M760 300c120 40 260 0 360 120" stroke-width="6"/>
+        </g>
+        <g transform="translate(1530 400) rotate(-6)">
+            <rect width="230" height="170" rx="10" fill="url(#scr)" stroke="#6fc9da" stroke-width="5"/>
+            <path d="M20 90h40l14-34 22 70 18-48 12 14h80" stroke="#bff3ff" stroke-width="5" fill="none"/>
+            <path d="M20 90h40l14-34 22 70 18-48 12 14h80" stroke="#5fd3e6" stroke-width="14" fill="none" filter="url(#glow)" opacity=".7"/>
+        </g>
+        <g transform="translate(1100 700)">
+            <rect width="250" height="150" rx="8" fill="url(#scr)" stroke="#6fc9da" stroke-width="5"/>
+            <path d="M18 80h50l12-30 18 60 16-40 10 10h100" stroke="#bff3ff" stroke-width="4" fill="none"/>
+            <rect x="105" y="150" width="40" height="80" fill="#123c48"/>
+        </g>
+        <g transform="translate(1440 640)">
+            <rect width="130" height="140" rx="8" fill="url(#scr)" stroke="#6fc9da" stroke-width="4"/>
+            <path d="M14 30h100M14 55h70M14 80h90M14 105h60" stroke="#9fe6f2" stroke-width="5"/>
+        </g>
+        <g transform="translate(1720 760)" opacity=".8">
+            <rect width="150" height="190" rx="8" fill="#0f3a46" stroke="#4aa8bb" stroke-width="4"/>
+            <path d="M18 40h110M18 70h80M18 100h100" stroke="#77cfe0" stroke-width="5"/>
+        </g>
+        <ellipse cx="1150" cy="620" rx="70" ry="22" fill="#cfefff" opacity=".35" filter="url(#glow)"/>
+    </svg>
+    <div class="logo-cover">
+        <svg viewBox="0 0 102 138" fill="#fff"><use href="#logo-if" width="102" height="138"/></svg>
+        <div class="txt"><b>INSTITUTO FEDERAL</b><span>Alagoas</span><span>Campus Arapiraca</span></div>
+    </div>
+    <h1>Engenharia clínica na UTI: equipamentos, infraestrutura e gestão</h1>
+    <div class="disc">Disciplina: Engenharia Clínica</div>
+    <div class="prof">Prof. Ícaro Fernando Fonsêca Braga</div>
+    <div class="footer"><span>IFAL · Campus Arapiraca</span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 2. ONDE ESTAMOS ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Onde estamos?</div>
+    <div class="body">
+        <div class="row" style="gap: 80px;">
+            <div class="visual step" style="width: 900px; height: 680px; flex-shrink: 0;">
+                <svg class="ic" width="360" height="360"><use href="#i-bed"/></svg>
+                <div class="cap">O leito de UTI</div>
+            </div>
+            <ul class="bullets col">
+                <li class="step">Unidade de Terapia Intensiva (UTI)</li>
+                <li class="step">RDC nº 7 e RDC nº 50</li>
+                <li class="step">NBR 13534 e IT médico</li>
+                <li class="step"><span class="hl-box" style="display:inline-block;">Engenharia clínica</span></li>
+                <li class="step">Gestão de tecnologias em saúde</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 3. OBJETIVOS ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Objetivos da aula<span class="sub">(Conceituais)</span></div>
+    <div class="body" style="top: 270px;">
+        <ul class="objectives">
+            <li class="step"><span class="k">Identificar</span> os principais equipamentos eletromédicos da UTI e seus <span class="k">requisitos de segurança</span>;</li>
+            <li class="step"><span class="k">Compreender</span> a infraestrutura que sustenta o leito crítico: <span class="k">energia, gases medicinais e climatização</span>;</li>
+            <li class="step"><span class="k">Conhecer</span> as ferramentas de gestão da engenharia clínica: <span class="k">ciclo de vida, manutenção, indicadores e tecnovigilância</span>.</li>
+        </ul>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 4. SITUAÇÃO-PROBLEMA ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Situação-problema</div>
+    <div class="body">
+        <div class="row" style="gap: 110px; align-items: center;">
+            <div class="step" style="width: 700px; height: 400px; flex-shrink: 0; background: repeating-linear-gradient(0deg, #b3001b 0 4px, #d0122c 4px 8px); border: 18px solid #1a0306; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 80px rgba(0,0,0,.55);">
+                <div style="font-family: Montserrat; font-weight: 900; font-size: 130px; color: #fff; letter-spacing: 6px; text-shadow: 0 0 20px rgba(255,255,255,.4);">ALERT</div>
+                <div style="font-family: 'DM Sans'; font-weight: 700; font-size: 58px; color: #fff; letter-spacing: 4px; margin-top: 10px;" id="timer">00:00:29:29</div>
+            </div>
+            <div class="col" style="position: relative;">
+                <svg width="210" height="170" viewBox="0 0 210 170" style="position:absolute; left:-200px; top:-130px;" class="step" fill="none" stroke="#c8102e" stroke-width="7" stroke-linecap="round"><path d="M10 120C40 30 120 10 150 60c20 34-30 50-30 10 0-40 60-50 80 0"/><path d="M180 50l20 20 10-28"/></svg>
+                <div class="card step" style="border-top-color: var(--red);">
+                    <h4 style="color: var(--red);">03h12 · Leito 7</h4>
+                    <p style="font-size: 34px; color: var(--ink); line-height: 1.4;">O <b>ventilador pulmonar</b> dispara um alarme de falha técnica. Ao lado, a <b>bomba de infusão</b> com droga vasoativa indica oclusão. O ventilador reserva… está na oficina.</p>
+                </div>
+                <div class="big-quote step" style="font-size: 44px; text-align: left; margin-top: 44px;">O que deveria ter sido feito <span style="color: var(--red);">antes</span> deste momento?</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 7. NORMAS ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">O arcabouço regulatório</div>
+    <div class="body">
+        <table class="tb">
+            <thead><tr class="step"><th style="width: 34%;">Norma</th><th>Escopo</th></tr></thead>
+            <tbody>
+                <tr class="step"><td>RDC nº 7/2010</td><td>Requisitos mínimos para o funcionamento de UTIs, incluindo equipamentos obrigatórios</td></tr>
+                <tr class="step"><td>RDC nº 50/2002</td><td>Projeto físico de estabelecimentos assistenciais de saúde</td></tr>
+                <tr class="step"><td>RDC nº 509/2021</td><td>Gerenciamento de tecnologias em saúde</td></tr>
+                <tr class="step"><td>NBR IEC 60601</td><td>Segurança e desempenho de equipamentos eletromédicos</td></tr>
+                <tr class="step"><td>NBR 13534</td><td>Instalações elétricas em estabelecimentos assistenciais de saúde</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 8. VENTILADOR ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Ventilador pulmonar</div>
+    <div class="body">
+        <div class="row" style="gap: 90px;">
+            <ul class="bullets normal col">
+                <li class="step"><b>Suporte à vida:</b> substitui ou auxilia a respiração. Não pode parar.</li>
+                <li class="step">Controla <b>volume, pressão, frequência e FiO₂</b>.</li>
+                <li class="step"><b>Preventiva rigorosa</b> e verificação periódica de desempenho.</li>
+                <li class="step"><b>Alarmes</b> sempre funcionais e testados.</li>
+                <li class="step"><b>Equipamento reserva</b> pronto para uso imediato.</li>
+            </ul>
+            <div class="visual step" style="width: 760px; height: 640px; flex-shrink: 0;">
+                <svg class="ic" width="330" height="330"><use href="#i-lungs"/></svg>
+                <div class="cap">Suporte ventilatório</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 12. GRUPO 2 / IT MÉDICO ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title sm">Grupo 2 e o<br>sistema IT médico <span style="font-weight: 400; font-size: 54px; text-transform: none;">(NBR 13534)</span></div>
+    <div class="body" style="top: 270px;">
+        <div class="row" style="gap: 70px; align-items: center;">
+            <div class="col">
+                <div class="card soft step" style="margin-bottom: 34px;"><p style="font-size: 30px; color: var(--ink);"><b style="color: var(--green);">Grupo 2:</b> local onde a descontinuidade da alimentação pode resultar em morte. <b>A UTI está aqui.</b></p></div>
+                <ol style="list-style: none; counter-reset: c;" class="step">
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green); margin-bottom: 12px;">1. UPS</li>
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green); margin-bottom: 12px;">2. Transformador de separação</li>
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green); margin-bottom: 12px;">3. Dispositivo supervisor de isolamento (DSI)</li>
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green); margin-bottom: 12px;">4. Painel</li>
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green); margin-bottom: 12px;">5. Anunciador de falhas (alarme)</li>
+                    <li style="font-size: 34px; font-weight: 600; color: var(--green);">6. Concentrador de falhas</li>
+                </ol>
+            </div>
+            <div style="width: 820px; flex-shrink: 0;">
+                <svg viewBox="0 0 420 240" class="step" style="width: 100%;" font-family="DM Sans">
+                    <g stroke="#1c2a1b" stroke-width="2.5" fill="none">
+                        <path d="M10 60h50M10 90h50"/>
+                        <rect x="60" y="40" width="70" height="70" rx="4" fill="#eaf5e9"/>
+                        <path d="M130 60h40M130 90h40"/>
+                        <circle cx="190" cy="75" r="22" fill="#fff"/><circle cx="214" cy="75" r="22" fill="#fff"/>
+                        <path d="M236 60h150M236 90h150"/>
+                        <rect x="270" y="130" width="70" height="44" rx="4" fill="#fff"/>
+                        <path d="M290 90v40M320 60v70"/>
+                        <path d="M305 174v26M290 200h30M295 206h20M300 212h10"/>
+                        <rect x="360" y="44" width="50" height="62" rx="4" fill="#0e3a46"/>
+                    </g>
+                    <text x="95" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#299626">UPS</text>
+                    <text x="202" y="125" text-anchor="middle" font-size="12" fill="#1c2a1b">Transformador</text>
+                    <text x="202" y="139" text-anchor="middle" font-size="12" fill="#1c2a1b">de separação</text>
+                    <text x="305" y="157" text-anchor="middle" font-size="16" font-weight="700" fill="#c8102e">DSI</text>
+                    <text x="385" y="124" text-anchor="middle" font-size="12" fill="#1c2a1b">Leito</text>
+                    <path d="M366 80h8l3-9 5 16 4-10 3 3h12" stroke="#5fd3e6" stroke-width="2" fill="none"/>
+                    <text x="35" y="50" text-anchor="middle" font-size="12" fill="#5b6660">Rede</text>
+                    <text x="300" y="34" text-anchor="middle" font-size="12" fill="#5b6660">sem aterramento direto (IT)</text>
+                </svg>
+                <div class="note step" style="margin-top: 26px; border-color: var(--red); font-size: 30px;"><span class="dot" style="background: var(--red);"></span>1ª falha à terra <b>&nbsp;não desliga</b>: aciona o alarme.</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 13. ENERGIA ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">E quando a energia falha?</div>
+    <div class="body" style="flex-direction: column; justify-content: center; gap: 70px;">
+        <div class="flow">
+            <div class="st step"><div class="bub"><svg width="70" height="70"><use href="#i-plug"/></svg></div><div class="n">1</div><div class="t">Rede normal</div><div class="d">Concessionária alimenta o hospital</div></div>
+            <div class="st step"><div class="bub red"><svg width="70" height="70"><use href="#i-bolt"/></svg></div><div class="n">2</div><div class="t">Falha da rede</div><div class="d">Apagão ou distúrbio</div></div>
+            <div class="st step"><div class="bub blue"><svg width="70" height="70"><use href="#i-battery"/></svg></div><div class="n">3</div><div class="t">UPS assume</div><div class="d">Sem interrupção para cargas críticas</div></div>
+            <div class="st step"><div class="bub amber"><svg width="70" height="70"><use href="#i-gen"/></svg></div><div class="n">4</div><div class="t">Gerador parte</div><div class="d">Partida, rampa e estabilização</div></div>
+            <div class="st step"><div class="bub"><svg width="70" height="70"><use href="#i-check"/></svg></div><div class="n">5</div><div class="t">Carga protegida</div><div class="d">Leito segue alimentado</div></div>
+        </div>
+        <div class="grid g3 step" style="max-width: 1600px; margin: 0 auto;">
+            <div class="note"><span class="dot" style="background: var(--green);"></span>Baterias internas nos equipamentos</div>
+            <div class="note"><span class="dot" style="background: var(--green);"></span>Tempos de comutação por norma</div>
+            <div class="note"><span class="dot" style="background: var(--red);"></span>Testes periódicos dos sistemas</div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 14. MACRO x MICRO ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Macrochoque × microchoque</div>
+    <div class="body" style="flex-direction: column; justify-content: center; gap: 50px;">
+        <div class="grid g2" style="gap: 60px;">
+            <div class="card step" style="text-align: center; padding: 40px;">
+                <h4>Macrochoque</h4>
+                <div style="font-family: Montserrat; font-weight: 900; font-size: 150px; line-height: 1; color: var(--ink); margin: 16px 0;">mA</div>
+                <p>Corrente atravessa o corpo <b style="color: var(--ink);">pela pele</b>. Dezenas de miliampères já podem causar fibrilação.</p>
+            </div>
+            <div class="card red step" style="text-align: center; padding: 40px;">
+                <h4>Microchoque</h4>
+                <div style="font-family: Montserrat; font-weight: 900; font-size: 150px; line-height: 1; color: var(--red); margin: 16px 0;">µA</div>
+                <p>Com cateter ou eletrodo <b style="color: var(--ink);">em contato com o coração</b>, correntes imperceptíveis podem ser fatais.</p>
+            </div>
+        </div>
+        <div class="big-quote step" style="font-size: 42px;">Ensaios de corrente de fuga (NBR IEC 60601) são obrigatórios</div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 17. MANUTENÇÃO E INDICADORES ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title sm">Manutenção e<br>indicadores</div>
+    <div class="body" style="top: 270px; flex-direction: column; justify-content: center; gap: 46px;">
+        <table class="tb">
+            <thead><tr class="step"><th style="width: 26%;">Tipo</th><th>Objetivo</th><th style="width: 22%;">Meta</th></tr></thead>
+            <tbody>
+                <tr class="step"><td>Corretiva</td><td>Consertar o que quebrou</td><td style="color: var(--red); font-weight: 700;">Minimizar</td></tr>
+                <tr class="step"><td>Preventiva</td><td>Evitar que quebre: inspeções e trocas programadas</td><td style="color: var(--green); font-weight: 700;">Maximizar</td></tr>
+                <tr class="step"><td>Calibração</td><td>Garantir que mede e entrega o que indica</td><td style="color: var(--green); font-weight: 700;">Cumprir o plano</td></tr>
+            </tbody>
+        </table>
+        <div class="grid g4">
+            <div class="card step" style="text-align: center; padding: 22px;"><h4 style="font-size: 44px; margin-bottom: 4px;">MTBF</h4><p style="font-size: 24px;">Tempo médio entre falhas</p></div>
+            <div class="card step" style="text-align: center; padding: 22px;"><h4 style="font-size: 44px; margin-bottom: 4px;">MTTR</h4><p style="font-size: 24px;">Tempo médio de reparo</p></div>
+            <div class="card step" style="text-align: center; padding: 22px;"><h4 style="font-size: 44px; margin-bottom: 4px;">Disp. %</h4><p style="font-size: 24px;">Disponibilidade para uso</p></div>
+            <div class="card step" style="text-align: center; padding: 22px;"><h4 style="font-size: 44px; margin-bottom: 4px;">Plano %</h4><p style="font-size: 24px;">Preventivas executadas</p></div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 19. TOMADA DE DECISÃO ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Tomada de decisão</div>
+    <div class="body">
+        <div class="row" style="gap: 70px; align-items: center;">
+            <div class="card step" style="flex: 1; border: 4px solid var(--ink); border-top: 12px solid var(--green); padding: 40px 50px;">
+                <h4 style="font-size: 32px; color: var(--ink); margin-bottom: 22px;">Orientação técnica · Engenharia clínica</h4>
+                <ol style="padding-left: 44px; font-size: 32px; line-height: 1.45; color: var(--ink);">
+                    <li class="step">Garantir o suporte ventilatório imediato (ventilação manual pela equipe e equipamento substituto).</li>
+                    <li class="step">Substituir a bomba de infusão e restabelecer a infusão.</li>
+                    <li class="step">Retirar de uso e identificar os equipamentos com falha.</li>
+                    <li class="step">Registrar a ocorrência e notificar no Notivisa quando aplicável.</li>
+                    <li class="step">Investigar a causa raiz da falha.</li>
+                    <li class="step"><b style="color: var(--red);">Revisar o plano de reserva e de preventivas.</b></li>
+                </ol>
+            </div>
+            <div class="visual step" style="width: 520px; height: 600px; flex-shrink: 0;">
+                <svg class="ic" width="240" height="240"><use href="#i-shield"/></svg>
+                <div class="cap">Prevenção &gt; reação</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<!-- ==================== 20. BIBLIOGRAFIA + ENCERRAMENTO ==================== -->
+<section class="slide">
+    <div class="logo"></div>
+    <div class="title">Bibliografia</div>
+    <div class="body bib top" style="top: 240px; display: block;">
+        <h5>Básica:</h5>
+        <p>BRASIL. Agência Nacional de Vigilância Sanitária. <b>Resolução RDC nº 7, de 24 de fevereiro de 2010.</b> Dispõe sobre os requisitos mínimos para funcionamento de Unidades de Terapia Intensiva. Brasília: ANVISA, 2010.</p>
+        <p>BRASIL. Agência Nacional de Vigilância Sanitária. <b>Resolução RDC nº 50, de 21 de fevereiro de 2002.</b> Regulamento técnico para projetos físicos de estabelecimentos assistenciais de saúde. Brasília: ANVISA, 2002.</p>
+        <p>BRASIL. Agência Nacional de Vigilância Sanitária. <b>Resolução RDC nº 509, de 27 de maio de 2021.</b> Gerenciamento de tecnologias em saúde. Brasília: ANVISA, 2021.</p>
+        <p>ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. <b>NBR 13534</b>: Instalações elétricas de baixa tensão — Requisitos específicos para instalação em estabelecimentos assistenciais de saúde. Rio de Janeiro: ABNT, 2008.</p>
+        <h5 style="margin-top: 26px;">Complementar:</h5>
+        <p>ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. <b>NBR IEC 60601-1</b>: Equipamento eletromédico — Parte 1: Requisitos gerais para segurança básica e desempenho essencial. Rio de Janeiro: ABNT, 2010.</p>
+        <p>BUGANZA, C.; BRITO, L. F. M.; TALES, R. M. <b>Segurança aplicada às instalações hospitalares.</b> 6. ed. São Paulo: Senac, 2014.</p>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+<section class="slide">
+    <div class="logo"></div>
+    <div class="end-wrap">
+        <div class="thanks step">Obrigado!</div>
+        <div class="q step">Dúvidas???</div>
+        <div class="epi step">Na UTI, tecnologia segura é cuidado em saúde.</div>
+    </div>
+    <div class="footer"><span class="pg"></span><span>Sistemas Biomédicos</span></div>
+</section>
+</div></div>
+<div id="hint">Espaço / → avançar · ← voltar · F tela cheia</div>
+
+<script>
+    // Logo do cabeçalho (versão clara: quadrados verdes, ponto vermelho)
+    const LOGO = `<svg viewBox="0 0 128 200"><g transform="translate(13 0) scale(0.75)" fill="#299626"><use href="#logo-if" width="102" height="138"/></g>
+        <circle cx="24.25" cy="11.25" r="11.25" fill="#c8102e"/>
+        <text x="64" y="138" text-anchor="middle" font-family="Open Sans, DM Sans, sans-serif" font-weight="800" font-size="25" fill="#1c2a1b">INSTITUTO</text>
+        <text x="64" y="162" text-anchor="middle" font-family="Open Sans, DM Sans, sans-serif" font-weight="800" font-size="25" fill="#1c2a1b">FEDERAL</text>
+        <text x="64" y="188" text-anchor="middle" font-family="Open Sans, DM Sans, sans-serif" font-size="20" fill="#1c2a1b">Alagoas</text></svg>`;
+    document.querySelectorAll('.slide .logo').forEach(el => el.innerHTML = LOGO);
+
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    slides.forEach((s, i) => { const pg = s.querySelector('.pg'); if (pg) pg.textContent = i + 1; });
+
+    // Escala do palco 1920x1080
+    const stage = document.getElementById('stage');
+    function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        stage.style.transform = `scale(${s})`;
+    }
+    window.addEventListener('resize', fit); fit();
+
+    // Navegação com animações em etapas
+    const steps = slides.map(s => Array.from(s.querySelectorAll('.step')));
+    let cur = 0, k = 0, t = 29 * 100 + 29;
+
+    function show(i) {
+        slides[cur].classList.remove('active');
+        cur = i; k = 0;
+        steps[i].forEach(e => e.classList.remove('in'));
+        slides[i].classList.add('active');
+        if (slides[i].querySelector('#timer')) t = 29 * 100 + 29;
+        if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+    }
+    function next() {
+        if (k < steps[cur].length) { steps[cur][k++].classList.add('in'); }
+        else if (cur < slides.length - 1) show(cur + 1);
+    }
+    function prev() { if (cur > 0) show(cur - 1); }
+    function revealAll() { steps[cur].forEach(e => e.classList.add('in')); k = steps[cur].length; }
+
+    document.addEventListener('keydown', e => {
+        if ([' ', 'ArrowRight', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+        else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); revealAll(); }
+        else if (e.key === 'Home') show(0);
+        else if (e.key === 'End') show(slides.length - 1);
+        else if (e.key === 'f' || e.key === 'F') {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.();
+        }
+    });
+    document.getElementById('viewport').addEventListener('click', e => {
+        if (e.clientX < window.innerWidth * 0.25) prev(); else next();
+    });
+    setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 5000);
+
+    // Cronômetro da situação-problema
+    setInterval(() => {
+        if (t <= 0) return; t--;
+        const s = Math.floor(t / 100), c = t % 100;
+        const el = document.getElementById('timer');
+        if (el) el.textContent = `00:00:${String(s).padStart(2,'0')}:${String(c).padStart(2,'0')}`;
+    }, 10);
+
+    const start = parseInt(location.hash.slice(1), 10);
+    if (start >= 1 && start <= slides.length) show(start - 1);
+</script>
+</body>
+</html>

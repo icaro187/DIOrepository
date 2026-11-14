@@ -65,6 +65,10 @@ The `style-references/` folder contains example presentations. Each serves as a 
 - Layout structures
 - Typography choices
 
+### Estilo IFAL · Sistemas Biomédicos
+
+`style-references/ifal-sistemas-biomedicos.html` reproduz a identidade das aulas do IFAL (Campus Arapiraca): palco 16:9, títulos em Montserrat Black verde (#299626), logo IF no topo, faixa verde no rodapé e destaques em vermelho. Segue o roteiro de aula: Capa → Onde estamos? → Objetivos → Situação-problema → Conteúdo → Tomada de decisão → Bibliografia → Obrigado/Dúvidas. As regras do estilo estão documentadas no comentário no topo do arquivo.
+
 ## 🎯 Best Practices
 
 1. **Script Writing**:
