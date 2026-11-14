@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engenharia Clínica na UTI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --white: #ffffff;
+            --off-white: #fafafa;
+            --light-gray: #f5f5f5;
+            --gray: #e5e5e5;
+            --medium-gray: #9ca3af;
+            --dark-gray: #6b7280;
+            --black: #111827;
+            --accent: #3b82f6;
+            --accent-light: #dbeafe;
+            --purple: #7c3aed;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --green: #059669;
+            --green-light: #ecfdf5;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.6;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: var(--white);
+        }
+
+        /* ---------- Slides ---------- */
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), visibility 0.8s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 70px 60px 110px;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .slide .content {
+            width: 100%;
+            max-width: 1100px;
+            max-height: calc(100vh - 180px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* ---------- Typography ---------- */
+        .eyebrow {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: clamp(40px, 5.5vw, 68px);
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: clamp(32px, 4.4vw, 52px);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 18px;
+        }
+
+        .subtitle {
+            font-family: 'Crimson Text', serif;
+            font-style: italic;
+            font-size: clamp(19px, 2.3vw, 26px);
+            color: var(--dark-gray);
+            max-width: 720px;
+            line-height: 1.4;
+            margin: 0 auto 10px;
+        }
+
+        .body-text {
+            font-size: clamp(16px, 1.6vw, 19px);
+            line-height: 1.7;
+            color: var(--dark-gray);
+            max-width: 760px;
+            margin: 14px auto 0;
+        }
+
+        .accent-text { color: var(--accent); font-weight: 600; }
+        .strong { color: var(--black); font-weight: 600; }
+
+        .quote-text {
+            font-family: 'Crimson Text', serif;
+            font-style: italic;
+            font-size: clamp(24px, 3.4vw, 40px);
+            line-height: 1.35;
+            color: var(--black);
+            max-width: 860px;
+            margin: 20px auto;
+        }
+
+        .simple-divider {
+            width: 60px;
+            height: 2px;
+            background: var(--gray);
+            margin: 28px auto;
+        }
+        .simple-divider.accent { background: var(--accent); }
+
+        /* ---------- Cards & grids ---------- */
+        .grid {
+            display: grid;
+            gap: 22px;
+            width: 100%;
+            margin: 34px auto 0;
+            max-width: 1040px;
+        }
+        .grid.cols-2 { grid-template-columns: repeat(2, 1fr); max-width: 900px; }
+        .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+        .simple-card {
+            background: var(--off-white);
+            padding: 28px 24px;
+            border-radius: 2px;
+            text-align: left;
+            position: relative;
+            transition: background 0.3s var(--ease), transform 0.3s var(--ease);
+        }
+        .simple-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s var(--ease);
+        }
+        .simple-card:hover { background: var(--light-gray); transform: translateY(-2px); }
+        .simple-card:hover::before { transform: scaleX(1); }
+
+        .simple-card .num {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+        .simple-card h4 {
+            font-size: clamp(17px, 1.7vw, 21px);
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .simple-card p {
+            font-size: clamp(14px, 1.25vw, 15.5px);
+            color: var(--dark-gray);
+            line-height: 1.55;
+        }
+        .simple-card.center { text-align: center; }
+
+        .simple-card.red { background: var(--red-light); }
+        .simple-card.red::before { background: var(--red); transform: scaleX(1); }
+        .simple-card.red .num { color: var(--red); }
+        .simple-card.green { background: var(--green-light); }
+        .simple-card.green::before { background: var(--green); transform: scaleX(1); }
+        .simple-card.green .num { color: var(--green); }
+
+        /* Big comparison values */
+        .big-value {
+            font-size: clamp(44px, 6vw, 72px);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            margin: 6px 0 12px;
+        }
+        .red .big-value { color: var(--red); }
+        .green .big-value { color: var(--green); }
+
+        /* Pills */
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 28px auto 0;
+            max-width: 900px;
+        }
+        .pill {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid var(--gray);
+            color: var(--black);
+            background: var(--white);
+            border-radius: 999px;
+        }
+
+        /* Clean list */
+        .clean-list {
+            list-style: none;
+            max-width: 720px;
+            margin: 26px auto 0;
+            text-align: left;
+        }
+        .clean-list li {
+            font-size: clamp(16px, 1.6vw, 19px);
+            line-height: 1.6;
+            color: var(--dark-gray);
+            margin-bottom: 14px;
+            padding-left: 30px;
+            position: relative;
+        }
+        .clean-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .clean-list li b { color: var(--black); font-weight: 600; }
+
+        /* Norm table */
+        .norm-list {
+            width: 100%;
+            max-width: 860px;
+            margin: 30px auto 0;
+            text-align: left;
+            border-top: 1px solid var(--gray);
+        }
+        .norm-row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 24px;
+            padding: 15px 4px;
+            border-bottom: 1px solid var(--gray);
+            align-items: baseline;
+        }
+        .norm-row .code { font-weight: 700; font-size: 17px; color: var(--accent); }
+        .norm-row .desc { font-size: 16px; color: var(--dark-gray); }
+
+        /* Life cycle */
+        .cycle {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 0;
+            width: 100%;
+            max-width: 1080px;
+            margin: 40px auto 0;
+        }
+        .cycle-step {
+            flex: 1;
+            text-align: center;
+            padding: 0 6px;
+            position: relative;
+        }
+        .cycle-step .dot {
+            width: 44px; height: 44px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--white);
+            position: relative;
+            z-index: 1;
+        }
+        .cycle-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 22px;
+            left: calc(50% + 22px);
+            width: calc(100% - 44px);
+            height: 2px;
+            background: var(--gray);
+        }
+        .cycle-step h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .cycle-step p { font-size: 13px; color: var(--dark-gray); line-height: 1.45; }
+
+        /* Leito diagram */
+        .bed-wrap { display: flex; gap: 44px; align-items: center; justify-content: center; margin-top: 30px; width: 100%; }
+        .bed-wrap svg { width: min(360px, 34vw); height: auto; flex-shrink: 0; }
+        .bed-wrap .clean-list { margin: 0; max-width: 480px; }
+
+        /* Stats */
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--medium-gray);
+        }
+
+        /* ---------- Step animations ---------- */
+        .step {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+        }
+        .step.animate-in { opacity: 1; transform: translateY(0); }
+        .step.pop { transform: scale(0.8); }
+        .step.pop.animate-in { transform: scale(1); }
+
+        /* ---------- Chrome ---------- */
+        .slide-counter {
+            position: fixed;
+            top: 40px;
+            right: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--medium-gray);
+            z-index: 1000;
+            font-variant-numeric: tabular-nums;
+        }
+        .slide-counter .current { color: var(--accent); font-weight: 600; }
+
+        .brand {
+            position: fixed;
+            top: 40px;
+            left: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--medium-gray);
+            z-index: 1000;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 34px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 24px;
+            z-index: 1000;
+        }
+        .nav-btn {
+            background: var(--white);
+            color: var(--medium-gray);
+            border: 1px solid var(--gray);
+            padding: 11px 24px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s var(--ease);
+        }
+        .nav-btn:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+
+        .progress {
+            position: fixed;
+            left: 0; bottom: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.6s var(--ease);
+            z-index: 1000;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1100px) {
+            .grid.cols-5 { grid-template-columns: repeat(3, 1fr); }
+            .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+            .simple-card { padding: 22px 20px; }
+        }
+        @media (max-width: 768px) {
+            .slide { padding: 70px 22px 100px; }
+            .slide .content { max-height: calc(100vh - 170px); }
+            h2 { font-size: clamp(24px, 7vw, 32px); margin-bottom: 10px; }
+            .eyebrow { margin-bottom: 10px; }
+            .subtitle { font-size: 17px; }
+            .body-text { font-size: 15px; }
+            .grid { margin-top: 18px; }
+            .grid.cols-2, .grid.cols-3, .grid.cols-5 { grid-template-columns: 1fr; gap: 10px; }
+            .grid.cols-4 { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .simple-card h4 { font-size: 15px; margin-bottom: 0; }
+            .simple-card .num { margin-bottom: 4px; }
+            .big-value { font-size: 36px; }
+            .simple-card { padding: 16px; }
+            .simple-card p { display: none; }
+            .norm-row { grid-template-columns: 1fr; gap: 2px; }
+            .cycle { flex-direction: column; gap: 10px; }
+            .cycle-step { display: flex; gap: 12px; align-items: center; text-align: left; }
+            .cycle-step .dot { margin: 0; width: 34px; height: 34px; flex-shrink: 0; }
+            .cycle-step::after { display: none; }
+            .cycle-step p { display: none; }
+            .bed-wrap { flex-direction: column; gap: 16px; }
+            .bed-wrap svg { width: 220px; }
+            .brand { display: none; }
+            .slide-counter { top: 24px; right: 22px; }
+            .nav { bottom: 24px; }
+        }
+    </style>
+</head>
+<body>
+<div class="presentation-container">
+    <div class="brand">Engenharia Clínica · UTI</div>
+    <div class="slide-counter"><span class="current" id="currentSlide">01</span> / <span id="totalSlides">20</span></div>
+
+    <!-- 1. Abertura -->
+    <section class="slide active">
+        <div class="content">
+            <div class="eyebrow">Aula · Engenharia Clínica</div>
+            <h1>Um leito.<br>Dezenas de tecnologias.</h1>
+            <div class="subtitle">Engenharia clínica na UTI: a tecnologia que sustenta a vida</div>
+            <div class="pill-row">
+                <span class="pill step">Monitor multiparamétrico</span>
+                <span class="pill step">Ventilador pulmonar</span>
+                <span class="pill step">Bombas de infusão</span>
+                <span class="pill step">Gases medicinais</span>
+                <span class="pill step">Energia especial</span>
+                <span class="pill step">Climatização</span>
+            </div>
+            <div class="body-text step">Quem garante que tudo isso funcione, com segurança, <span class="strong">24 horas por dia</span>?</div>
+        </div>
+    </section>
+
+    <!-- 2. O que é -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Conceito</div>
+            <h2>O que é engenharia clínica</h2>
+            <div class="subtitle">Engenharia e gestão aplicadas às tecnologias em saúde</div>
+            <div class="grid cols-4">
+                <div class="simple-card step"><div class="num">01</div><h4>Planeja</h4><p>Define necessidades e especifica tecnologias</p></div>
+                <div class="simple-card step"><div class="num">02</div><h4>Garante</h4><p>Recebe, testa, mantém e calibra equipamentos</p></div>
+                <div class="simple-card step"><div class="num">03</div><h4>Capacita</h4><p>Treina a equipe assistencial para o uso seguro</p></div>
+                <div class="simple-card step"><div class="num">04</div><h4>Decide</h4><p>Avalia riscos e quando substituir uma tecnologia</p></div>
+            </div>
+            <div class="body-text step">A ponte entre <span class="strong">equipe assistencial</span>, <span class="strong">fabricantes</span> e <span class="strong">gestão do hospital</span>.</div>
+        </div>
+    </section>
+
+    <!-- 3. Por que UTI -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Contexto</div>
+            <h2>Por que a UTI é o ambiente mais crítico</h2>
+            <div class="grid cols-3">
+                <div class="simple-card step"><h4>Pacientes graves</h4><p>Sedados, inconscientes e dependentes de suporte artificial</p></div>
+                <div class="simple-card step"><h4>Máxima densidade</h4><p>O setor com mais equipamentos por leito em todo o hospital</p></div>
+                <div class="simple-card step"><h4>Falha = evento grave</h4><p>Aqui, um defeito não é um incômodo: é um risco à vida</p></div>
+            </div>
+            <div class="pill-row step">
+                <span class="pill">Redundância</span>
+                <span class="pill">Equipamentos reserva</span>
+                <span class="pill">Infraestrutura dedicada</span>
+                <span class="pill">Resposta técnica rápida</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Normas -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Regulação</div>
+            <h2>O arcabouço regulatório</h2>
+            <div class="norm-list">
+                <div class="norm-row step"><div class="code">RDC 7/2010</div><div class="desc">Requisitos mínimos de funcionamento de UTIs, incluindo os equipamentos obrigatórios</div></div>
+                <div class="norm-row step"><div class="code">RDC 50/2002</div><div class="desc">Projeto físico de estabelecimentos assistenciais de saúde</div></div>
+                <div class="norm-row step"><div class="code">RDC 509/2021</div><div class="desc">Gerenciamento de tecnologias em saúde</div></div>
+                <div class="norm-row step"><div class="code">NBR IEC 60601</div><div class="desc">Segurança e desempenho de equipamentos eletromédicos</div></div>
+                <div class="norm-row step"><div class="code">NBR 13534</div><div class="desc">Instalações elétricas em estabelecimentos assistenciais de saúde</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Ventilador -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Equipamentos · Suporte à vida</div>
+            <h2>Ventilador pulmonar</h2>
+            <div class="subtitle">Substitui ou auxilia a respiração do paciente. Não pode parar.</div>
+            <div class="grid cols-4">
+                <div class="simple-card center step"><h4>Volume</h4></div>
+                <div class="simple-card center step"><h4>Pressão</h4></div>
+                <div class="simple-card center step"><h4>Frequência</h4></div>
+                <div class="simple-card center step"><h4>FiO₂</h4></div>
+            </div>
+            <ul class="clean-list step">
+                <li>Manutenção preventiva rigorosa e verificação de desempenho</li>
+                <li>Alarmes sempre funcionais</li>
+                <li><b>Equipamento reserva</b> pronto para uso imediato</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 6. Monitor -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Equipamentos · Monitoramento</div>
+            <h2>Monitor multiparamétrico</h2>
+            <div class="subtitle">Acompanhamento contínuo dos sinais vitais</div>
+            <div class="pill-row">
+                <span class="pill step">ECG</span>
+                <span class="pill step">Frequência cardíaca</span>
+                <span class="pill step">SpO₂</span>
+                <span class="pill step">PNI</span>
+                <span class="pill step">Pressão invasiva</span>
+                <span class="pill step">Temperatura</span>
+                <span class="pill step">Capnografia</span>
+            </div>
+            <div class="simple-divider accent step"></div>
+            <div class="body-text step">Conectados a uma <span class="strong">central de monitorização</span> no posto de enfermagem. A engenharia clínica garante a <span class="accent-text">calibração</span> e a <span class="accent-text">confiabilidade dos alarmes</span>.</div>
+        </div>
+    </section>
+
+    <!-- 7. Bombas -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Equipamentos · Terapia infusional</div>
+            <h2>Bombas de infusão</h2>
+            <div class="quote-text step">Um erro de vazão pode ser fatal.</div>
+            <div class="grid cols-3">
+                <div class="simple-card step"><h4>Vazão precisa</h4><p>Drogas vasoativas, sedativos e nutrição, muitas vezes simultâneos</p></div>
+                <div class="simple-card step"><h4>Bombas inteligentes</h4><p>Bibliotecas de medicamentos e limites de dose reduzem erros</p></div>
+                <div class="simple-card step"><h4>Ensaios de vazão</h4><p>Testes periódicos de exatidão fazem parte da rotina</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Desfibrilador -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Equipamentos · Emergência</div>
+            <h2>Desfibrilador e carro de parada</h2>
+            <div class="grid cols-2">
+                <div class="simple-card step"><div class="num">DESFIBRILADOR</div><h4>Choque elétrico controlado</h4><p>Reverte arritmias graves, como a fibrilação ventricular. Verificação diária com teste de energia entregue.</p></div>
+                <div class="simple-card step"><div class="num">CARRO DE EMERGÊNCIA</div><h4>Material de reanimação</h4><p>Reúne medicamentos e dispositivos de reanimação. Checagem em todos os turnos.</p></div>
+            </div>
+            <div class="body-text step">Sempre <span class="strong">carregado</span>, <span class="strong">testado</span> e <span class="strong">pronto</span>.</div>
+        </div>
+    </section>
+
+    <!-- 9. Outros -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Equipamentos</div>
+            <h2>Outros equipamentos essenciais</h2>
+            <div class="pill-row" style="max-width: 820px;">
+                <span class="pill step">Aspiradores</span>
+                <span class="pill step">Eletrocardiógrafos</span>
+                <span class="pill step">Oxímetros portáteis</span>
+                <span class="pill step">Camas motorizadas</span>
+                <span class="pill step">Hemodiálise</span>
+                <span class="pill step">Ultrassom à beira do leito</span>
+                <span class="pill step">Gasômetros</span>
+                <span class="pill step">Incubadoras (UTI neonatal)</span>
+            </div>
+            <div class="body-text step">Cada um com seus próprios <span class="accent-text">riscos</span>, rotinas de <span class="accent-text">manutenção</span> e requisitos de <span class="accent-text">treinamento</span>.</div>
+        </div>
+    </section>
+
+    <!-- 10. Infraestrutura física -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Infraestrutura · RDC 50/2002</div>
+            <h2>Infraestrutura física do leito</h2>
+            <div class="bed-wrap">
+                <svg viewBox="0 0 360 260" class="step" role="img" aria-label="Planta esquemática de um leito de UTI">
+                    <rect x="10" y="10" width="340" height="240" fill="#fafafa" stroke="#e5e5e5" stroke-width="2"/>
+                    <rect x="40" y="18" width="280" height="14" rx="2" fill="#dbeafe" stroke="#3b82f6"/>
+                    <text x="180" y="29" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="Inter">RÉGUA DE GASES E TOMADAS</text>
+                    <rect x="140" y="50" width="80" height="140" rx="6" fill="#fff" stroke="#111827" stroke-width="2"/>
+                    <rect x="152" y="58" width="56" height="26" rx="4" fill="#f5f5f5" stroke="#9ca3af"/>
+                    <rect x="236" y="56" width="40" height="30" rx="3" fill="#fff" stroke="#9ca3af"/>
+                    <text x="256" y="100" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">Monitor</text>
+                    <rect x="84" y="56" width="40" height="40" rx="3" fill="#fff" stroke="#9ca3af"/>
+                    <text x="104" y="110" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">Ventilador</text>
+                    <path d="M120 120 L60 120 M240 120 L300 120 M180 196 L180 236" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a)" marker-start="url(#a)"/>
+                    <text x="180" y="248" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="Inter">acesso por todos os lados</text>
+                    <rect x="300" y="210" width="36" height="26" rx="3" fill="#fff" stroke="#9ca3af"/>
+                    <text x="318" y="204" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">Lavatório</text>
+                    <defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#3b82f6"/></marker></defs>
+                </svg>
+                <ul class="clean-list">
+                    <li class="step"><b>Área mínima</b> para circulação de equipe e equipamentos</li>
+                    <li class="step"><b>Acesso ao paciente</b> por todos os lados</li>
+                    <li class="step"><b>Visibilidade</b> a partir do posto de enfermagem</li>
+                    <li class="step"><b>Lavatório</b> para higienização das mãos</li>
+                    <li class="step"><b>Iluminação</b> adequada para procedimentos</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Grupo 2 -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Infraestrutura · NBR 13534</div>
+            <h2>Instalações elétricas: <span class="accent-text">Grupo 2</span></h2>
+            <div class="subtitle">Local onde a falta de energia coloca a vida em risco e há partes aplicadas ao paciente</div>
+            <div class="grid cols-3">
+                <div class="simple-card step"><div class="num">01</div><h4>Sistema IT médico</h4><p>Alimentação isolada da terra para os circuitos do leito</p></div>
+                <div class="simple-card step"><div class="num">02</div><h4>Transformador de isolamento</h4><p>Separa galvanicamente a rede do leito da rede geral</p></div>
+                <div class="simple-card step"><div class="num">03</div><h4>DSI</h4><p>Dispositivo supervisor de isolamento monitora o sistema continuamente</p></div>
+            </div>
+            <div class="body-text step">A <span class="strong">primeira falha à terra não desliga</span> os equipamentos: apenas aciona um <span class="accent-text">alarme</span>.</div>
+        </div>
+    </section>
+
+    <!-- 12. Energia -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Infraestrutura · Continuidade</div>
+            <h2>Energia que não pode faltar</h2>
+            <div class="grid cols-4">
+                <div class="simple-card step"><h4>Grupos geradores</h4><p>Assumem a carga quando a rede da concessionária falha</p></div>
+                <div class="simple-card step"><h4>Fontes de segurança</h4><p>Tempos de comutação definidos por norma</p></div>
+                <div class="simple-card step"><h4>Baterias internas</h4><p>Presentes nos equipamentos críticos</p></div>
+                <div class="simple-card step"><h4>Nobreaks</h4><p>Garantem continuidade sem interrupção</p></div>
+            </div>
+            <div class="quote-text step" style="font-size: clamp(22px, 2.8vw, 32px);">Descobrir uma falha no momento de um apagão é tarde demais.</div>
+        </div>
+    </section>
+
+    <!-- 13. Macro x micro -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Segurança elétrica · NBR IEC 60601</div>
+            <h2>Macrochoque × microchoque</h2>
+            <div class="grid cols-2">
+                <div class="simple-card step" style="text-align:center;">
+                    <div class="num">MACROCHOQUE</div>
+                    <div class="big-value" style="color: var(--black);">mA</div>
+                    <div class="stat-label" style="margin-bottom: 12px;">dezenas de miliampères</div>
+                    <p>A corrente atravessa o corpo pela pele e pode causar fibrilação</p>
+                </div>
+                <div class="simple-card red step" style="text-align:center;">
+                    <div class="num">MICROCHOQUE</div>
+                    <div class="big-value">µA</div>
+                    <div class="stat-label" style="margin-bottom: 12px;">ordem de microampères</div>
+                    <p>Com cateter ou eletrodo em contato com o coração, correntes imperceptíveis podem ser fatais</p>
+                </div>
+            </div>
+            <div class="body-text step">Por isso, os <span class="accent-text">ensaios de corrente de fuga</span> são obrigatórios.</div>
+        </div>
+    </section>
+
+    <!-- 14. Gases -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Infraestrutura · Gases medicinais</div>
+            <h2>Gases medicinais e vácuo</h2>
+            <div class="grid cols-3">
+                <div class="simple-card center step"><div class="num">O₂</div><h4>Oxigênio</h4></div>
+                <div class="simple-card center step"><div class="num">AR</div><h4>Ar comprimido medicinal</h4></div>
+                <div class="simple-card center step"><div class="num">VÁCUO</div><h4>Vácuo clínico</h4></div>
+            </div>
+            <div class="pill-row step">
+                <span class="pill">Central de suprimento</span>
+                <span class="pill">Válvulas de seção</span>
+                <span class="pill">Alarmes de pressão</span>
+                <span class="pill">Réguas de gases</span>
+            </div>
+            <div class="body-text step">Conectores <span class="strong">padronizados e não intercambiáveis</span> impedem que um gás seja ligado no lugar de outro.</div>
+        </div>
+    </section>
+
+    <!-- 15. Climatização -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Infraestrutura · NBR 7256</div>
+            <h2>Climatização e controle de infecção</h2>
+            <div class="pill-row">
+                <span class="pill step">Temperatura</span>
+                <span class="pill step">Umidade</span>
+                <span class="pill step">Renovação do ar</span>
+                <span class="pill step">Filtragem</span>
+            </div>
+            <div class="grid cols-2">
+                <div class="simple-card step"><div class="num">PRESSÃO NEGATIVA</div><h4>Contém</h4><p>Impede que agentes infecciosos saiam do quarto de isolamento</p></div>
+                <div class="simple-card step"><div class="num">PRESSÃO POSITIVA</div><h4>Protege</h4><p>Impede a entrada de contaminantes no quarto do imunossuprimido</p></div>
+            </div>
+            <div class="body-text step">Uma <span class="accent-text">barreira invisível</span> contra infecções hospitalares.</div>
+        </div>
+    </section>
+
+    <!-- 16. Ciclo de vida -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Gestão</div>
+            <h2>O ciclo de vida da tecnologia</h2>
+            <div class="cycle">
+                <div class="cycle-step step"><div class="dot">1</div><h4>Planejamento</h4><p>Necessidade</p></div>
+                <div class="cycle-step step"><div class="dot">2</div><h4>Especificação</h4><p>Requisitos técnicos</p></div>
+                <div class="cycle-step step"><div class="dot">3</div><h4>Aquisição</h4><p>Compra</p></div>
+                <div class="cycle-step step"><div class="dot">4</div><h4>Recebimento</h4><p>Testes de aceitação</p></div>
+                <div class="cycle-step step"><div class="dot">5</div><h4>Instalação</h4><p>e treinamento</p></div>
+                <div class="cycle-step step"><div class="dot">6</div><h4>Uso</h4><p>e manutenção</p></div>
+                <div class="cycle-step step"><div class="dot">7</div><h4>Desativação</h4><p>e descarte</p></div>
+            </div>
+            <div class="simple-divider accent step"></div>
+            <div class="body-text step">Um equipamento mal especificado na compra gera problemas <span class="strong">durante toda a sua vida útil</span>.</div>
+        </div>
+    </section>
+
+    <!-- 17. Manutenção -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Gestão · Manutenção</div>
+            <h2>Preventiva, corretiva e calibração</h2>
+            <div class="grid cols-3">
+                <div class="simple-card red step"><div class="num">MINIMIZAR</div><h4>Corretiva</h4><p>Conserta o que quebrou</p></div>
+                <div class="simple-card green step"><div class="num">MAXIMIZAR</div><h4>Preventiva</h4><p>Evita que quebre, com inspeções e trocas programadas</p></div>
+                <div class="simple-card step"><div class="num">GARANTIR</div><h4>Calibração</h4><p>Confirma que o equipamento mede e entrega o que indica</p></div>
+            </div>
+            <div class="body-text step">Programa <span class="accent-text">baseado em risco</span>: equipamentos de suporte à vida têm <span class="strong">prioridade máxima</span>.</div>
+        </div>
+    </section>
+
+    <!-- 18. Indicadores -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Gestão · Indicadores</div>
+            <h2>O que não se mede não se gerencia</h2>
+            <div class="grid cols-4">
+                <div class="simple-card center step pop"><div class="big-value" style="font-size: clamp(30px, 3.4vw, 44px); color: var(--accent);">MTBF</div><h4>Confiabilidade</h4><p>Tempo médio entre falhas</p></div>
+                <div class="simple-card center step pop"><div class="big-value" style="font-size: clamp(30px, 3.4vw, 44px); color: var(--accent);">MTTR</div><h4>Agilidade</h4><p>Tempo médio de reparo</p></div>
+                <div class="simple-card center step pop"><div class="big-value" style="font-size: clamp(30px, 3.4vw, 44px); color: var(--accent);">%</div><h4>Disponibilidade</h4><p>Tempo em que o equipamento está apto ao uso</p></div>
+                <div class="simple-card center step pop"><div class="big-value" style="font-size: clamp(30px, 3.4vw, 44px); color: var(--accent);">✓</div><h4>Plano cumprido</h4><p>Taxa de execução das preventivas</p></div>
+            </div>
+            <div class="body-text step">Números que orientam decisões de <span class="strong">compra</span>, <span class="strong">substituição</span> e <span class="strong">contratação</span>.</div>
+        </div>
+    </section>
+
+    <!-- 19. Riscos -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Gestão · Riscos</div>
+            <h2>Gestão de riscos e tecnovigilância</h2>
+            <div class="grid cols-3">
+                <div class="simple-card red step"><h4>Fadiga de alarmes</h4><p>Excesso de alarmes leva a equipe a ignorar os que importam</p></div>
+                <div class="simple-card red step"><h4>Erros de uso</h4><p>Interfaces complexas e treinamento insuficiente</p></div>
+                <div class="simple-card red step"><h4>Falhas de equipamento</h4><p>Defeitos de projeto, fabricação ou manutenção</p></div>
+            </div>
+            <div class="grid cols-4" style="margin-top: 22px;">
+                <div class="simple-card green center step"><div class="num">01</div><h4>Notificar</h4><p>Notivisa / Anvisa</p></div>
+                <div class="simple-card green center step"><div class="num">02</div><h4>Investigar</h4><p>Causa raiz</p></div>
+                <div class="simple-card green center step"><div class="num">03</div><h4>Retirar</h4><p>Se necessário</p></div>
+                <div class="simple-card green center step"><div class="num">04</div><h4>Prevenir</h4><p>Ações corretivas</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 20. Encerramento -->
+    <section class="slide">
+        <div class="content">
+            <div class="eyebrow">Encerramento</div>
+            <h2>O engenheiro à beira do leito</h2>
+            <ul class="clean-list" style="max-width: 640px;">
+                <li class="step">Em cada <b>alarme confiável</b></li>
+                <li class="step">Em cada <b>choque entregue</b> com a energia correta</li>
+                <li class="step">Em cada litro de <b>oxigênio</b> que chega ao leito</li>
+            </ul>
+            <div class="simple-divider accent step"></div>
+            <div class="quote-text step">Na UTI, tecnologia segura é cuidado em saúde.</div>
+        </div>
+    </section>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="previousSlide()">Anterior</button>
+        <button class="nav-btn" onclick="nextAction()">Próximo</button>
+    </div>
+    <div class="progress" id="progress"></div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let currentAnimationStep = 0;
+
+    document.getElementById('totalSlides').textContent = String(totalSlides).padStart(2, '0');
+
+    // Each slide's sequential animations: its .step elements, in document order
+    const slideAnimations = Array.from(slides).map(slide => Array.from(slide.querySelectorAll('.step')));
+
+    function initializeSlideElements(index) {
+        // Reset: all steps hidden until triggered; slides without steps show immediately
+        slideAnimations[index].forEach(el => el.classList.remove('animate-in'));
+        currentAnimationStep = 0;
+    }
+
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        currentSlide = index;
+        initializeSlideElements(index);
+        slides[index].classList.add('active');
+        document.getElementById('currentSlide').textContent = String(index + 1).padStart(2, '0');
+        document.getElementById('progress').style.width = ((index + 1) / totalSlides * 100) + '%';
+    }
+
+    function nextAction() {
+        const steps = slideAnimations[currentSlide];
+        if (currentAnimationStep < steps.length) {
+            steps[currentAnimationStep].classList.add('animate-in');
+            currentAnimationStep++;
+        } else if (currentSlide < totalSlides - 1) {
+            showSlide(currentSlide + 1);
+        }
+    }
+
+    function previousSlide() {
+        if (currentSlide > 0) showSlide(currentSlide - 1);
+    }
+
+    function revealAll() {
+        const steps = slideAnimations[currentSlide];
+        steps.forEach(el => el.classList.add('animate-in'));
+        currentAnimationStep = steps.length;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'PageDown') {
+            e.preventDefault();
+            nextAction();
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            previousSlide();
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            revealAll();
+        } else if (e.key === 'Home') {
+            showSlide(0);
+        } else if (e.key === 'End') {
+            showSlide(totalSlides - 1);
+        }
+    });
+
+    // Tap/click on the slide area advances (buttons handle themselves)
+    document.querySelector('.presentation-container').addEventListener('click', (e) => {
+        if (e.target.closest('.nav')) return;
+        if (e.clientX < window.innerWidth * 0.25) previousSlide();
+        else nextAction();
+    });
+
+    showSlide(0);
+</script>
+</body>
+</html>
